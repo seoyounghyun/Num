@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+	
+	<!-- @RequestMapping어노테이션 테스트용 빈 등록-->
+	<bean class="controller.annotation.RequestMappingController"/>
+	<!-- @RequestParam어노테이션 테스트용 빈 등록-->
+	<bean class="controller.annotation.RequestParamController"/>
+	<!-- @ModelAttribute어노테이션 테스트용 빈 등록-->
+	<bean class="controller.annotation.ModelAttributeController"/>
+	<!-- [DI와 관련된 어노테이션들] -->
+	<!--  1]@Required어노테이션 -->
+	<!-- @Required어노테이션을 사용하기 위한 선행 조건:클래스 등록 -->
+	<!--  
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+	-->
+	<!-- DI관련 @Autowired ,@Required 및 @Resource
+	        어노테이션을 공통으로 적용하기 위한
+	        태그 등록:<context:annotation-config/>
+	 -->	
+	<context:annotation-config/>
+	
+	<!-- @Required 어노테이션 처리용 빈 등록 -->
+	<bean p:message="[@Required 어노테이션]" class="controller.annotation.RequiredController"/>
+	<!-- 2]@Autowired어노테이션 -->
+	<!-- @Autowired어노테이션을 사용하기 위한 선행조건: 클래스 등록 -->
+	<!--  
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	-->
+	<!-- 와이어링(설정파일에서 대상 클래스에 객체를 주입하는 과정) 대상 객체 빈 등록 -->
+	<bean id="command_first" p:name="가길동" p:years="20" class="controller.annotation.Command"/>
+	
+	<bean id="command_second" class="controller.annotation.Command">
+		<property name="name" value="나길동"/>
+		<property name="years" value="30"/>
+	</bean>	
+	<!--  @Autowired어노테이션 처리용 빈 등록 -->
+	<bean class="controller.annotation.AutowiredController"/>
+	<!--  @Resource어노테이션 처리용 빈 등록 -->
+	<bean class="controller.annotation.ResourceController"/>
+	<!-- [기타 어노테이션들] -->
+	<!-- @SessionAttribute어노테이션 처리용 빈 등록 -->
+	<bean class="controller.annotation.SessionAttributeController"/>
+	<!-- @ModelAttribute로 로그인여부 판단시 발생에러 처리 -->
+	<!--  
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.springframework.web.HttpSessionRequiredException">/Annotation_07/Annotation.jsp</prop>
+			</props>
+		</property>	
+	</bean>
+	-->
+	<!-- @SessionAtrribute(types=커맨드클래스명.class) 사용시
+	     HttpSessionRequiredException에러 발생 처리하기위해
+	     아래 태그 등록
+	 -->
+	<mvc:annotation-driven/>	
+	<!-- @ResponseBody어노테이션 처리용 빈 등록 -->
+	<bean class="controller.annotation.ResponseBodyController"/>
+	<!-- 
+ 	@ResponseBody어노테이션 사용시 한글처리]
+ 	Step1] @RequestMapping(value="요청명",produces="컨텐츠타입")
+ 	Step2] 스프링 설정파일 생성시(xml) mvc접두어 추가후
+ 	태그 등록 -<mvc:annotation-driven/>	
+ 	--> 
+ 	<!-- @RequestHeader어노테이션 처리용 빈 등록 -->
+ 	<bean class="controller.annotation.RequestHeaderController"/>
+ 	<!-- 
+	 <context:component-scan base-package="최상위 패키지명"/>
+	 -최상위 패키지부터 하위 패키 안에 있는
+	 모든 컴포넌트(자바클래스)를 자동으로 생성해준다
+	 즉 설정파일에 빈을 등록할 필요 없다.
+	 
+	 단, class앞에 @Controller,@Component,@Service,@Ropository
+	 가 붙은 클래스만 생성해 준다.
+	 각 클래스의 성격에 따라 적절한 어노테이션을 붙이자
+	 @Controller:사용자 요청을 처리하는 클래스
+	 @Service : 서비스 역할을 하는 클래스
+	 @Repository:DAO계열 클래스
+	 @Component:기타 클래스
+	  --> 
+</beans>

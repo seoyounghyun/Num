@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+	<!-- 컴포넌트 스캔 적용 즉 빈 등록 불필요 -->
+	<context:component-scan base-package="com.academy.replybbs"/>
+	<!-- DI관련 @Autowired ,@Required 및 @Resource
+	        어노테이션을 공통으로 적용하기 위한
+	        태그 등록
+	 -->
+	 <context:annotation-config/>
+	 <!-- @ResponseBody한글처리 및 @SessionAttribute와 @ModelAttribute와 커맨드 객체로 로그인처리시 필요 -->	 
+	 <mvc:annotation-driven/>	
+	 <!-- 빈에서 사용할 키값이 있는 리소스파일을 사용하기 위한
+	       태그 등록
+	 -->
+	 <context:property-placeholder location="classpath:com/academy/replybbs/resource/resource.properties"/>
+	 <!-- 접두어 및 접미어 설정을 위해 기본 뷰리졸버를 빈으로 등록 -->
+	 <bean p:order="1" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+			<!--  접두어 설정-->
+			<property name="prefix" value="/WEB-INF/replybbs/"/>			
+			<!--  접미어 설정 -->
+			<property name="suffix" value=".jsp"/>
+	 </bean>
+	 <!-- tiles사용을 위한 bean등록(web.servlet-버전.jar)--> 
+	 <bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/replybbs/template/layouts.xml</value>
+			</list>
+		</property>		
+	</bean>
+	<!-- tiles를 처리하도록 또 다른 뷰리졸버 등록 -->
+	<bean  class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+			<property name="order" value="0"/>  <!-- .jsp도 view로 사용하기 위해 우선순위를 가장먼저--> 
+			<property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView"/>
+	</bean>
+	 
+</beans>

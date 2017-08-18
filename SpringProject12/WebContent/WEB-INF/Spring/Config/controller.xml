@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!--  사용자 요청을 처리할 빈 등록 -->
+	<!-- 페이지 이동 첫번째]내가 만든 컨트롤러로 페이지 이동 -->
+	<bean class="controller.controller.MoveByMeController"/>
+	<!-- 페이지 이동 두번째]스프링에서 제공하는 컨트롤러로 페이지 이동 -->
+	<bean name="/Controller/MoveBySpring.do" class="org.springframework.web.servlet.mvc.ParameterizableViewController">
+		<property name="viewName" value="/Controller_02/Controller.jsp"/>
+	</bean>
+	<!-- Controller인터페이스 상속으로 컨트롤러 구현 -->
+	<bean name="/Controller/ControllerInterface.do" class="controller.controller.ControllerByInterface"/>
+	<!-- AbstractController클래스 상속으로 컨트롤러 구현 -->
+	<bean p:supportedMethods="POST,GET" name="/Controller/AbstractController.do" class="controller.controller.ControllerByAbstract"/>
+	<!-- 어노테이션으로 컨트롤러 구현 -->
+	<!-- 
+		필수 속성:class
+		name속성 불필요.
+		컨트롤러 클래스에서 사용자 요청 매핑
+	 -->
+	 <bean class="controller.controller.ControllerByAnnotation"/>
+	  <!-- 하나의 컨트롤러 클래스로 다수 요청 처리하기(다수개의 메소드) -->
+	  <bean class="controller.controller.OneClassMultiMethod"/>
+	  <!-- 하나의 컨트롤러 클래스로 다수 요청 처리하기(한개의 메소드) -->
+	  <bean class="controller.controller.OneClassOneMethod"/>
+	  
+</beans>

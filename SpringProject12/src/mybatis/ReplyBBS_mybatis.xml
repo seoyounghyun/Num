@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace속성:매퍼파일의 완전한경로 .xml는 생략 -->
+<!-- ※ibatis와는 다르게 id값에 .(dot)를 사용 못한다. -->
+<mapper namespace="mybatis.ReplyBBS_mybatis">
+	<!--resultMap사용시 column속성 필수  -->
+	<resultMap id="ReplyBBSDtoResult" type="ReplyBBSDto">
+	    <result property="no" column="no"/>
+	    <result property="id" column="id"/>
+	    <result property="title" column="title"/>
+	    <result property="content" column="content"/>
+	    <result property="postdate" column="postdate"/>
+	    <result property="refer" column="refer"/>
+	    <result property="step" column="step"/>
+	    <result property="depth" column="depth"/>
+	    <result property="name" column="name"/>
+ 	</resultMap>
+ 	<!-- id속성에 지정한 값을 자바코드(DAO계열 클래스)에서 
+           식별자로 사용 -->
+ 	<select id="ReplyBBSLogin" parameterType="java.util.Map" resultType="int">
+		SELECT COUNT(*) FROM MEMBER WHERE ID=#{id} AND PWD=#{pwd}	
+	</select>
+	
+	<select id="ReplyBBSlist" parameterType="java.util.Map" resultMap="ReplyBBSDtoResult">
+		SELECT * FROM (SELECT T.*,ROWNUM R FROM (SELECT RE.*,NAME FROM MEMBER M JOIN REPLYBBS RE ON M.ID=RE.ID
+		
+		<if test="searchColumn != null">
+			WHERE ${searchColumn} LIKE '%' || #{searchWord} || '%' 
+		</if>		
+		ORDER BY REFER DESC,STEP ASC) T) WHERE R BETWEEN #{start} AND #{end}
+	</select>
+	<select id="ReplyBBStotal" parameterType="java.util.Map" resultType="int">
+		SELECT COUNT(*) FROM REPLYBBS RE JOIN MEMBER M ON RE.ID=M.ID 
+		
+		<if test="searchColumn != null">
+			WHERE ${searchColumn} LIKE '%' || #{searchWord} || '%' 
+		</if>	
+	</select>
+	<insert id="ReplyBBSinsert" parameterType="ReplyBBSDto">
+		INSERT INTO REPLYBBS(NO,ID,TITLE,CONTENT,REFER) VALUES(SEQ_REPLYBBS.NEXTVAL,#{id},#{title},#{content},SEQ_REPLYBBS.CURRVAL)
+	</insert>
+	<select id="ReplyBBSone" parameterType="java.util.Map" resultType="ReplyBBSDto">
+		SELECT RE.*,NAME FROM MEMBER M JOIN REPLYBBS RE ON M.ID=RE.ID WHERE NO=#{no}
+	</select>
+	
+	<update id="ReplyBBSupdate" parameterType="ReplyBBSDto">
+		UPDATE REPLYBBS SET TITLE=#{title},CONTENT=#{content} WHERE NO=#{no}
+	</update>
+	<delete id="ReplyBBSdelete" parameterType="ReplyBBSDto">
+		DELETE REPLYBBS WHERE NO=#{no}
+	</delete>
+	<update id="ReplyBBSreply_update" parameterType="java.util.Map">
+		UPDATE REPLYBBS SET STEP=STEP+1 WHERE REFER=#{refer} AND STEP &gt; #{step}
+	</update>
+	<insert id="ReplyBBSreply_insert" parameterType="java.util.Map">
+		INSERT INTO REPLYBBS VALUES(SEQ_REPLYBBS.NEXTVAL,#{id},#{title},#{content},SYSDATE,#{refer},#{step}+1,#{depth}+1)
+	
+	</insert>
+</mapper>

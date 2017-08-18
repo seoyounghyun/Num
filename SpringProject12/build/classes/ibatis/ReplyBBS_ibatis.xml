@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ReplyBBS">
+
+  <!-- Use type aliases to avoid typing the full classname every time. -->
+  <typeAlias alias="ReplyBBSDto" type="com.academy.replybbs.service.ReplyBBSDto"/>
+
+  <!-- Result maps describe the mapping between the columns returned
+       from a query, and the class properties.  A result map isn't
+       necessary if the columns (or aliases) match to the properties 
+       exactly. -->
+  <!-- 
+       테이블의 컬럼명 과 DTO클래스의 속성명이 
+       정확히 일치한다면 아래 내용(resultMap엘리먼트)은 
+       필요없다, 
+         
+      단 사용해도  상관없다.
+     column속성은 생략가능
+     (DTO의 속성명과 테이블의 컬러명이 일치하면)
+        
+     property:DTO클래스의 속성명지정
+     column:DTO에 해당하는 테이블의 컬럼명 지정
+            컬럼명과 DTO의 속성명이 
+            불일치할때는 반드시 지정
+    -->
+  <resultMap id="ReplyBBSDtoResult" class="ReplyBBSDto">
+    <result property="no" column="no"/>
+    <result property="id" />
+    <result property="title" />
+    <result property="content" />
+    <result property="postdate" />
+    <result property="refer" />
+    <result property="step" />
+    <result property="depth" />
+    <result property="name" />
+  </resultMap>
+  <!-- 
+	  parameterClass가 Map이거나 혹은 DTO계열인 경우
+	   반드시 
+	   Map은 #키값#
+	   DTO는 #속성명# 또한 대소문자도 반드시 지켜라.
+	   파라미터 클래스가 String이거나 int인경우
+	   #임의의변수#해도 상관없다.
+	   
+	   
+	#값# ->값에 해당하는 곳에서만 #을  쓴다.
+	$객체$ -> 객체에 해당하는곳에는 $를 쓴다
+	(예:테이블명 혹은 컬럼명등)
+	 
+	WHERE조건에 < 혹은  >를 사용하려면
+	방법1) >는 &gt;로  < 는 &lt;로
+	      >= 는 &gt;= , <=  는 &lt;=
+	   예]
+	    SELECT * FROM EMP
+	    WHERE SAL &gt;=3000 AND SAL &lt;=4000
+	                
+	방법2) <![CDATA[
+	   이안에서는 <,>를 자유롭게 쓸 수 있다.
+	   
+	   ]]>
+	   
+	   예] 
+	   SELECT * FROM EMP
+	   <![CDATA[
+	   WHERE SAL >=3000 AND SAL <=4000
+	     ]]>
+	 
+	parameterClass가  컬렉션(Map)이거나 DTO계열인 경우
+	DTO나 MAP의 속성값을 비교해서
+	쿼리문을  분기할 수 있다.   
+	property속성에는 Map인 경우는 키값을
+	DTO인경우는 속성을 넣어주고
+	compareValue에는 비교값을 지정한다(단,한글은 안된다)
+	 
+	-->
+	 <!-- id속성에 지정한 값을 자바코드(DAO계열 클래스)에서 
+           식별자로 사용 -->
+	<select id="ReplyBBS.Login" parameterClass="java.util.Map" resultClass="int">
+		SELECT COUNT(*) FROM MEMBER WHERE ID=#id# AND PWD=#pwd#	
+	</select>
+	
+	<select id="ReplyBBS.list" parameterClass="java.util.Map" resultMap="ReplyBBSDtoResult">
+		SELECT * FROM (SELECT T.*,ROWNUM R FROM (SELECT RE.*,NAME FROM MEMBER M JOIN REPLYBBS RE ON M.ID=RE.ID
+		<isNotNull property="searchColumn">
+			WHERE $searchColumn$ LIKE '%' || #searchWord# || '%' 
+		</isNotNull>
+		ORDER BY REFER DESC,STEP ASC) T) WHERE R BETWEEN #start# AND #end#
+	</select>
+	<select id="ReplyBBS.total" parameterClass="java.util.Map" resultClass="int">
+		SELECT COUNT(*) FROM REPLYBBS RE JOIN MEMBER M ON RE.ID=M.ID 
+		
+		<isNotNull property="searchColumn">
+			WHERE $searchColumn$ LIKE '%' || #searchWord# || '%' 
+		</isNotNull>
+	
+	</select>
+	<insert id="ReplyBBS.insert" parameterClass="ReplyBBSDto">
+		INSERT INTO REPLYBBS(NO,ID,TITLE,CONTENT,REFER) VALUES(SEQ_REPLYBBS.NEXTVAL,#id#,#title#,#content#,SEQ_REPLYBBS.CURRVAL)
+	</insert>
+	<select id="ReplyBBS.one" parameterClass="java.util.Map" resultClass="ReplyBBSDto">
+		SELECT RE.*,NAME FROM MEMBER M JOIN REPLYBBS RE ON M.ID=RE.ID WHERE NO=#no#
+	</select>
+	
+	<update id="ReplyBBS.update" parameterClass="ReplyBBSDto">
+		UPDATE REPLYBBS SET TITLE=#title#,CONTENT=#content# WHERE NO=#no#
+	</update>
+	<delete id="ReplyBBS.delete" parameterClass="ReplyBBSDto">
+		DELETE REPLYBBS WHERE NO=#no#
+	</delete>
+	<update id="ReplyBBS.reply_update" parameterClass="java.util.Map">
+		UPDATE REPLYBBS SET STEP=STEP+1 WHERE REFER=#refer# AND STEP &gt; #step#
+	</update>
+	<insert id="ReplyBBS.reply_insert" parameterClass="java.util.Map">
+		INSERT INTO REPLYBBS VALUES(SEQ_REPLYBBS.NEXTVAL,#id#,#title#,#content#,SYSDATE,#refer#,#step#+1,#depth#+1)
+	
+	</insert>
+</sqlMap>

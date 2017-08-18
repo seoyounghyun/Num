@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!-- 사용자 요청을 처리할 자바빈(클래스) 등록 -->
+	<!-- 
+		lazy-init:빈의 생성시기 결정
+		                 디폴트 false
+		          false:BeanFactory 생성시 빈 설정파일에
+		                 등록한 클래스가 생성됨.
+		          true:등록한 클래스가 필요한 시점에 생성됨.
+		          true로 설정하더라도 lazy-init="false"인 빈이
+		                의존하게되면 BeanFactory 생성시 생성됨.
+		name:URL패턴(/반드시 포함)
+		
+		init-method:초기화 메소드(등록한 빈 생성시 초기화 작업이 있는 경우)
+		destroy-method:소멸 메소드(등록한 빈 소멸시 작업이 필요한 경우)
+	 -->	
+	<!-- BeanNameUrlHandlerMapping사용 -->
+	<bean init-method="init" destroy-method="destroy" name="/Basic/Controller.do" class="controller.basic.ControllerByController"/>
+	<bean name="/Basic/AbstractController.do" class="controller.basic.ControllerByAbstractController">
+		<property name="supportedMethods" value="POST,GET"/>
+	</bean>
+	<!-- DefaultAnnotationHandlerMapping사용:어노테이션 사용 -->
+	<bean class="controller.basic.AnnotationController"/>
+
+</beans>

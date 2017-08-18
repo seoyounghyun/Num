@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<!-- iBatis 환경설정파일
+     1]데이타베이스 연결정보 설정
+     2]매퍼파일의 위치정보 설정
+ -->
+<sqlMapConfig>
+	
+	<!-- 
+   dataSource의 하위태그인 property태그의 value속성을
+    EL형식으로 처리 가능 즉 .properties파일에 상수로 설정
+   -->
+  <properties resource="ibatis/ibatis.properties"/>
+
+  <!-- 아래 속성이 true로 설정되면
+       .xml파일(매퍼파일)이나 .java파일(DAO게열 클래스)에서 
+        식별자(id)값을
+        반드시 네임스페이명.임의의값 
+   -->
+  <settings useStatementNamespaces="true"/>
+  <!-- 스프링에서 지원하는 API(SqlMapClientFactoryBean/
+       SqlMapClientTemplate)
+           사용시 아래 데이타베이스 연결정보 설정는 불필요
+           매퍼파일의 위치정보 설정만 하면됨    
+            -->    
+	<!--        
+  <transactionManager type="JDBC" commitRequired="false">
+  -->   
+    <!--  JDBC API사용(커넥션 풀 미 사용) -->
+    <!--  
+    <dataSource type="SIMPLE">
+      <property name="JDBC.Driver" value="${DRIVER}"/>
+      <property name="JDBC.ConnectionURL" value="${URL}"/>
+      <property name="JDBC.Username" value="${USERNAME}"/>
+      <property name="JDBC.Password" value="${PASSWORD}"/>
+    </dataSource>
+    -->
+    <!--  커넥션 풀 사용 -->
+    <!-- 
+     name속성은 반드시 DataSource(대소문자 주의)
+     value속성- server.xml에 설정한 JNDI명을
+                  풀 네임으로
+     -->
+     <!--  
+     <dataSource type="JNDI">
+     	<property name="DataSource" value="${JNDI_NAME}"/>
+     </dataSource>
+  </transactionManager>-->
+
+  <!-- 매퍼파일 -->
+  <sqlMap resource="ibatis/ReplyBBS_ibatis.xml"/>
+ 
+
+</sqlMapConfig>

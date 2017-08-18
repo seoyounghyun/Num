@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>SpringProject</display-name>
+  	<!-- 
+    	웹 어플리케이션이 최초 실행될때
+    	가장 먼저 인스턴스화 되는 리스너
+    	-디폴트로 WEB-INF밑에 applicationContext.xml을
+    	 설정파일로 사용
+    	 즉 각각의 디스패처 서블릿에 의해
+    	 생성된 컨텍스트에서 공통으로 사용하는
+    	 자바빈을 등록할때 사용한다.    
+   -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>  
+	</listener>
+	<!-- 
+  		컨텍스트 초기화 파라미터로 applicationContext.xml의
+	   	이름 및 위치 변경가능
+     -->
+     <context-param>
+     	<param-name>contextConfigLocation</param-name>
+     	<!-- src에 패키지로 config생성 -->
+     	<param-value>classpath:config/root-context.xml</param-value>
+     </context-param>    
+  
+  <!-- 기본 디스패처 서블릿 -->
+  <!--  
+  	 front controller등록(DispatcherServlet) :
+  	  맨 앞단에서 사용자 요청을 받는 컨트롤러로
+      요청을 분석후 그 요청을 처리할 컨트롤러 클래스에게
+      넘긴다.
+  	-->  
+  <servlet>
+		<servlet-name>FrontController</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+    		<param-value>/WEB-INF/Spring/Config/*.xml</param-value>		
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+		<servlet-name>FrontController</servlet-name>
+		<url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  <!-- 
+   	복수의 DispatcherServlet등록시 
+   	url-pattern이 중복되면 404오류(애매하니까)   
+    -->
+  <!--  또 다른 디스패처 서블릿 -->
+  <servlet>
+		<servlet-name>AnotherDispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+		<servlet-name>AnotherDispatcher</servlet-name>
+		<url-pattern>*.kosmo</url-pattern>
+  </servlet-mapping>
+  
+   <!-- 빈 설정파일명 및 파일위치 변경하기 -->
+   <!-- 1]WEB-INF밑에 폴더 생성후 위치 시키기 -->
+   <servlet>
+		<servlet-name>WEBINF</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 서블릿 초기화 파라미터로 변경 -->
+    	<!-- param-name은 반드시  contextConfigLocation로
+     		 왜냐하면 DispatcherServlet의 setContextConfigLocation(String)
+     		 호출해야 하니까]
+    		-->
+    	<init-param>
+    		<param-name>contextConfigLocation</param-name>
+    		<param-value>/WEB-INF/beanConfig/beanConfig.xml</param-value>
+    	</init-param>	
+    		
+		<load-on-startup>1</load-on-startup>
+   </servlet>
+   <servlet-mapping>
+		<servlet-name>WEBINF</servlet-name>
+		<url-pattern>*.nate</url-pattern>
+   </servlet-mapping>
+   <!-- 2]src밑에 패키지 생성후 위치 시키기 -->
+   <servlet>
+		<servlet-name>SRC</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 서블릿 초기화 파라미터로 변경 -->
+    	<!-- param-name은 반드시  contextConfigLocation로
+     		 왜냐하면 DispatcherServlet의 setContextConfigLocation(String)
+     		 호출해야 하니까]
+    		-->
+    	<init-param>
+    		<param-name>contextConfigLocation</param-name>
+    		<param-value>classpath:beanconfig/beanConfig.xml</param-value>
+    	</init-param>	
+    		
+		<load-on-startup>1</load-on-startup>
+   </servlet>
+   <servlet-mapping>
+		<servlet-name>SRC</servlet-name>
+		<url-pattern>*.daum</url-pattern>
+   </servlet-mapping>
+   
+  <!-- ViewResolver의 접두어 및 접미어 테스트를 위한 별도의 디스패처서블릿 설정 -->
+   <servlet>
+		<servlet-name>VIEWRESOLVER</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>		
+    	<init-param>
+    		<param-name>contextConfigLocation</param-name>
+    		<param-value>classpath:beanconfig/viewresolver.xml</param-value>
+    	</init-param>	
+    		
+		<load-on-startup>1</load-on-startup>
+   </servlet>
+   <servlet-mapping>
+		<servlet-name>VIEWRESOLVER</servlet-name>
+		<url-pattern>*.vrv</url-pattern>
+   </servlet-mapping>
+   <!--  한글 깨지는 거 방지 -->
+  	<filter>
+		<filter-name>CharacterEncoding</filter-name> <!-- filter-name은 임의로-->
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<!-- param-name과 param-value은 아래처럼-->
+			<param-name>encoding</param-name><!--setEncoding()호출-->
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+ 	<filter-mapping>
+  		<filter-name>CharacterEncoding</filter-name> 
+  		<url-pattern>/*</url-pattern>
+  	</filter-mapping>
+ 
+  <!-- 답변형 게시판 웹어플리케이션 컨텍스트 영역 생성을 위한  
+               디스패처 서블릿 등록 -->
+  <servlet>
+		<servlet-name>REPLYBBS</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>		
+    	<init-param>
+    		<param-name>contextConfigLocation</param-name>
+    		<param-value>/WEB-INF/replybbs/config/*.xml</param-value>
+    	</init-param>	
+    		
+		<load-on-startup>1</load-on-startup>
+   </servlet>
+   <servlet-mapping>
+		<servlet-name>REPLYBBS</servlet-name>
+		<url-pattern>*.bbs</url-pattern>
+   </servlet-mapping> 
+  <welcome-file-list>
+  	<!-- 답변형 게시판 이동용 시작 문서 설정 -->
+  	<welcome-file>/WEB-INF/index.jsp</welcome-file>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>

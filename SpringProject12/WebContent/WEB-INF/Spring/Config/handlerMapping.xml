@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+		<!-- 
+	 	원칙: .do요청과  매핑된 클래스는 
+	           bean설정 파일에 하나만 등록 가능
+	            여러개 동시 등록시 
+	           "There is already handler of type 컨트롤러클래스 mapped" 
+	           에러 발생
+	           단,  .do 요청과 매핑을 하지 않은 
+	           기타 클래스는 여러개 등록 가능  
+	  	-->
+ 
+		 <!--   BeanNameUrlHandlerMapping -->
+		 <!--
+		     -기본 핸들러 매핑
+		     -빈의 이름에 지정한 요청명과 컨트롤 클래스를 매핑
+		      bean엘리먼트의 name속성에 
+		       컨텍스트 루트를 제외한 경로 지정(반드시 /부터)
+		      class속성에는 요청을 처리할 컨트롤러 클래스 지정
+		  --> 
+		<bean name="/HandlerMapping/BeanNameUrl.do" class="controller.handlermapping.BeanNameUrlController"/>
+		<!--  DefaultAnnotationHandlerMapping -->
+		<!--  	
+	 	-기본 핸들러 매핑
+	 	-class속성 필수(name속성 불필요)
+	 	-요청과 매핑은 class속성에 지정한 컨트롤러 클래스의
+	 	 어노테이션으로 매핑
+	 	 -->
+		<bean class="controller.handlermapping.AnnotationController"/>	
+		<!-- SimpleUrlHandlerMapping -->
+		<!--    
+		   -기본 핸들러 매핑이 아님으로 사용시에는 반드시 
+		    xml파일에 bean으로
+		    등록(
+		    bean등록시 기본 핸들러 매핑은 더 이상 제공되지 않음)
+		   -한 섹션안에서  여러 요청과 컨트롤러 클래스를 
+		    관리하고자 할때 주로 사용  
+		 -->
+		 <!-- 
+		 SimpleUrlFirstController first = new SimpleUrlFirstController()
+		 즉 id값이 인스턴스변수와 같다. 
+		 프레임웍이 빈 생성시 위와 같이 생성해줌.	
+		 -->
+		<bean id="first" class="controller.handlermapping.SimpleUrlFirstController"/>
+		<bean id="second" class="controller.handlermapping.SimpleUrlSecondController"/>  
+		 
+		<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+			<property name="order" value="3"/>
+			<property name="mappings">
+				<props>
+				<!-- 
+   					key: 요청명(.do)
+   					<prop>엘리먼트 사이에는
+   					컨트롤러 클래스의 id값 지정
+   		     		-->
+   		     		<prop key="/HandlerMapping/SimpleUrlFirst.do">first</prop>
+   		     		<prop key="/HandlerMapping/SimpleUrlSecond.do">second</prop>
+				</props>			
+			</property>
+		</bean>	
+		
+		 <!--기본 핸들러 매핑이 아닌 핸들러 매핑을 사용시
+		      기본 핸들러 매핑은 더 이상 제공되지 않는다.
+		      그래서 반드시 빈으로 등록 해야 한다.
+		 -->
+		 <!--  디폴트 핸들러 매핑 빈으로 등록 --> 
+		 <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+		 	<!-- 
+	   		HandlerMapping계열 클래스의 order속성:
+	   		DispatcherServlet이 요청이 들어 왔을때
+	   		그 요청을 처리할 컨트롤러가 누구인지
+	   		문의할 순서를 결정한다.
+    		-->
+    		<property name="order" value="2"/>
+		 </bean>
+		 <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		 	<property name="order" value="1"/>
+		 </bean>
+</beans>

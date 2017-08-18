@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+	
+	<!-- 
+	  [리소스파일에 등록한 키값 사용하기]
+	  -설정파일(XML)에서 EL표현식을 사용해서 읽을 수 있다.
+	   단,EL식 사용시 빈 공백 없어야 한다 ${키값   }[X]
+	   
+	  1]src밑에 파일명.properties파일 생성(파일명은 임의로)
+	  2]빈 설정파일에 PropertyPlaceholderConfigurer를
+	    등록하거나 property-placeholder를 context접두어 등록
+	    
+	    1]에서등록한 리소스파일의 위치를 
+	    locations혹은 location(property-placeholder일때)
+	    속성을 통해서 설정해 준다
+	    
+	  3]빈 설정 파일에 등록한 빈에 키값을 주입하기 우해
+	    setter인젝션 사용.
+	    값 설정시에는 EL식으로(단, 공백 없어야 함) 
+	 -->
+	<!-- 리소스 파일(.properties)사용을 위한 빈 등록 -->
+	<!-- 
+	   -src밑에 위치한 리소스 파일을
+	    value태그에  classpath:패키지명1/패키지명2/리소스파일
+	    위치 정보를 넣어준다.
+	   -여러개 의 분리된 리소스 파일 사용시에는
+	    value태그를 계속 추가해주면된다.
+	 -->
+	<!--  
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:resource/resource.properties</value>
+				<value>classpath:resource/subresource/resource.properties</value>
+			</list>
+		</property>
+	</bean>
+	-->
+	<!--방법2] context접두어 사용(리소스파일이 여러개인 경우
+ 	     ,(콤마)로 구분해서 나열) -->
+ 	<context:property-placeholder location="classpath:resource/resource.properties,classpath:resource/subresource/resource.properties"/>    
+ 	     
+ 	     
+ 	     
+	<!-- 컨트롤러에 주입할 커맨드객체(DTO계열) 빈 등록-
+ 	        세터 인젝션을 통해 초기화 --> 
+ 	<bean id="command" p:user="${user}" p:name="${name}" class="controller.resource.UserCommand">
+ 		<property name="pass" value="${pass}"/>
+ 	</bean>       
+ 	        
+	<!-- 사용자 요청을 처리할 빈 등록(컨트롤러) -->
+	<bean  class="controller.resource.ResourceController"/>
+
+</beans>

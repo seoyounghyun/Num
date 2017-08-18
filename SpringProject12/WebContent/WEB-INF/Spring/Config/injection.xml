@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<!-- 사용자 요청을 처리할 빈(컨트롤러 클래스) 등록 -->
+	<!-- 
+	※사용자 요청과 매핑이 안된 컨트롤러 계열이
+	아닌 클래스는 여러개의 빈을 등록 가능.
+	단, 사용자 요청을 처리하는 컨트롤러 클래스는
+	하나만 빈으로 등록 가능
+	 -->
+	 <!-- 
+	생성자 인젝션 및 세터 인젝션시
+	주입할 값이 객체이면 ref속성 사용,
+	주입할 값이 기본 자료형이거나 String이면 value
+	속성에 값 지정	
+	
+	또한 bean등록시 id속성은 인스턴스 변수와 같다
+	그래서 다른 빈에서 참조할때 사용한다(참조시에는 ref속성으로)
+	 -->
+	<!-- [생성자를 통한 주입] -->
+	<!-- 주입 대상이 될 Person클래스를 빈으로 등록 -->
+	<!--1]type과 value혹은 ref속성 사용 -->
+	<!-- Person personType = new Person("한소인","가산",20);와 같다 -->	
+	<bean id="personType" class="controller.injection.Person" >
+		<constructor-arg type="java.lang.String" value="한소인"/>
+		<constructor-arg type="java.lang.String" value="가산"/>
+		<constructor-arg type="int" value="20"/>
+	</bean>
+	<!--2]index와 value혹은 ref속성 사용 -->
+	<!-- Person personIndex = new Person("박길동","강남",40);와 같다 -->
+	<bean id="personIndex" class="controller.injection.Person">
+		<constructor-arg index="0" value="박길동"/>
+		<constructor-arg index="1" value="강남"/>
+		<constructor-arg index="2" value="40"/>
+	</bean>
+	<!-- 생성자 인젝션을 테스트 하기 위한, 사용자 요청을
+	         처리할 빈 등록
+	 -->
+	 <bean class="controller.injection.ConstructorController">
+	 	<constructor-arg>
+	 		<!-- 
+				constructor-arg태그 안에서 생성된 빈(Person)은
+				다른 빈에서 사용불가(지역변수와 같다)
+		 	-->
+	 		<!-- new Person();와 같다. -->
+	 		<bean class="controller.injection.Person"/>	 	
+	 	</constructor-arg>
+	 	<constructor-arg index="1" ref="personType"/>
+	 	<constructor-arg index="2" ref="personIndex"/>
+	 </bean>
+	 
+	<!-- [세터를 통한 주입] -->
+	<!-- property태그를 이용해서 주입하거나 p접두어(p:)사용해서 주입-->
+	 <!-- 
+	  name속성:해당빈의 멤버변수명(속성명)
+	  ref 혹은 value속성:
+	  주입할 대상이 객체이면 ref, 기본자료형 혹은
+	  String타입이면 value속성 사용
+	  -->
+	 <!-- setter를 호출한거와 같다 --> 
+	 <bean p:addr="강동" p:age="10" id="personProperty" class="controller.injection.Person">
+	 	<property name="name" value="강길동"/>
+	 </bean>
+	 <!-- 세터를 통한 주입을 테스트 하기위한, 사용자 요청 처리용 빈 등록  -->
+	 <bean p:per1-ref="personProperty"  class="controller.injection.SetterController">
+	 	<property name="per2" ref="personIndex"/>
+	 </bean>
+	 
+	  <!-- 
+	      문1]빈 설정파일에 아래 요청을 처리하기 위한 클래스를 등록하여라
+	    (클래스명:InjectionController)
+	   -->
+	  <bean class="controller.injection.InjectionController">
+	  <!--  
+	  	문2]InjectionController클래스는 생성자 인젝션을 통해 Person타입을
+	      주입받도록 하여라.단, Person의 기본 생성자로 생성된 객체를 주입하여라
+	    -->
+	  	<constructor-arg>
+	  		<bean class="controller.injection.Person"/>
+	  	</constructor-arg>
+	  </bean>
+	 
+	 
+</beans>
